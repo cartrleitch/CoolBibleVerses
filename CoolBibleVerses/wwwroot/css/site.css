@@ -25,3 +25,47 @@ privacy {
     background: red;
     font-size : 28px;
 }
+
+.button-primary {
+    background-color: rgb(111, 53, 12);
+    color: white;
+    padding: 6px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 6px;
+}
+
+    .button-primary:hover {
+        color: #fff;
+        background-color: rgb(80, 32, 6);
+        border-color: rgb(80, 32, 6);
+    }
+
+.button-danger {
+    background-color: #ca091b;
+    border: none;
+    color: white;
+    padding: 6px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 6px;
+}
+
+    .button-danger:hover {
+        color: #fff;
+        background-color: #9f0816;
+        border-color: #9f0816;
+    }
+
+.nav{
+
+}
+
+    .nav:hover {
+        background-color: #e8e8e8;
+        border-color: #e8e8e8;
+    }

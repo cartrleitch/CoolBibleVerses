@@ -8,6 +8,10 @@
         public int Verse { get; set; }
         public string Text { get; set; }
 
-        // maybe ESV API instead of Text stored in DB
+        // maybe use ESV API to get the text
+
+        public BibleVerse()
+        {
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using CoolBibleVerses.Models;
 
 namespace CoolBibleVerses.Data
 {
@@ -9,5 +10,6 @@ namespace CoolBibleVerses.Data
             : base(options)
         {
         }
+        public DbSet<CoolBibleVerses.Models.BibleVerse> BibleVerse { get; set; } = default!;
     }
 }
