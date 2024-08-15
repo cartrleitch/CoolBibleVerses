@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CoolBibleVerses.Data;
 using CoolBibleVerses.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoolBibleVerses.Controllers
 {
@@ -44,6 +45,7 @@ namespace CoolBibleVerses.Controllers
         }
 
         // GET: BibleVerses/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -66,6 +68,7 @@ namespace CoolBibleVerses.Controllers
         }
 
         // GET: BibleVerses/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,6 +89,7 @@ namespace CoolBibleVerses.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Book,Chapter,Verse,Text")] BibleVerse bibleVerse)
         {
             if (id != bibleVerse.Id)
@@ -117,6 +121,7 @@ namespace CoolBibleVerses.Controllers
         }
 
         // GET: BibleVerses/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -137,6 +142,7 @@ namespace CoolBibleVerses.Controllers
         // POST: BibleVerses/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var bibleVerse = await _context.BibleVerse.FindAsync(id);
