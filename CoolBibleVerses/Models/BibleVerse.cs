@@ -8,7 +8,9 @@
         public int Verse { get; set; }
         public string Text { get; set; }
 
-        // maybe use ESV API to get the text
+        //public List<string> Tags { get; set; } = new List<string>();
+
+        // maybe use ESV API to get the text to populate the Text
 
         public BibleVerse()
         {

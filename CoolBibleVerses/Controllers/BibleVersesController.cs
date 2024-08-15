@@ -149,6 +149,11 @@ namespace CoolBibleVerses.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> ShowSearchResults(String SearchTerm)
+        {
+            return View("Index", await _context.BibleVerse.Where(v=>v.Text.Contains(SearchTerm)).ToListAsync()); ;
+        }
+
         private bool BibleVerseExists(int id)
         {
             return _context.BibleVerse.Any(e => e.Id == id);

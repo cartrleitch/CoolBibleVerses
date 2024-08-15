@@ -4,7 +4,19 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>All Verses</h1>
+<form asp-action="ShowSearchResults">
+    <div>
+        <label for="SearchTerm">Search for verse:</label>
+        <input name="SearchTerm" class="form-control" style="width:75%" /> 
+    </div>
+    <div>
+        <p></p>
+        <input type="submit" value="Search" class="button-primary" />
+    </div>
+</form>
+
+<p></p>
 
 <p>
     <a asp-action="Create" class="button-primary">Create New</a>
