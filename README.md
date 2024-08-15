@@ -6,3 +6,4 @@ Todo:
 5. Record when and by whom a verse was entered
 6. Add details section for added info about verse
 7. Make it look nice
+8. Deploy on Pi
