@@ -63,9 +63,19 @@
                 @Html.DisplayFor(modelItem => item.Text)
             </td>
             <td>
+                @{int curTag = 0;}
                 @foreach (var tag in item.VerseTags)
                 {
-                    <span>@tag.Tag</span>
+                        
+                    if (curTag > 0)
+                    {
+                        <span> @tag.Tag</span>
+                    }
+                    else
+                    {
+                        <span>@tag.Tag</span>
+                    }
+                    curTag++;
                 }
             </td>
             <td>

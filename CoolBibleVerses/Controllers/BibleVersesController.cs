@@ -70,7 +70,7 @@ namespace CoolBibleVerses.Controllers
                 {
                     var verseTag = new VerseTag
                     {
-                        Tag = tag,
+                        Tag = tag.ToLower().Trim(),
                         BibleVerseId = bibleVerse.Id
                     };
                     _context.VerseTag.Add(verseTag);
