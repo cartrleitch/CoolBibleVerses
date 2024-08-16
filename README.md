@@ -7,4 +7,5 @@ Todo:
 6. Delegate permissions to add and delete, requiring manual verification or something.
 7. Make it look nice
     Fix styling on account manage pages
-8. Deploy on Pi
+    Do something nice on the welcome page
+9. Deploy on Pi
