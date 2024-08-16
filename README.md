@@ -1,12 +1,10 @@
 Todo:
-1. Add tags to search by as well
-2. Allow editing tags and details
-3. Retrieve text from ESV for Text
-    Shorten text in index if too long
-4. Enable searching by Book-Chapter-Verse or by text
-5. Order search results by relevancy, and order default index view by book, chapter, and verse.
-6. Record when and by whom a verse was entered
-7. Delegate permissions to add and delete, requiring manual verification or something.
-8. Make it look nice
+1. Allow editing tags and details
+2. Enable searching by Book-Chapter-Verse or by text
+3. Add tags to search by as well
+4. Order search results by relevancy, and order default index view by book, chapter, and verse.
+5. Record when and by whom a verse was entered
+6. Delegate permissions to add and delete, requiring manual verification or something.
+7. Make it look nice
     Fix styling on account manage pages
-9. Deploy on Pi
+8. Deploy on Pi
