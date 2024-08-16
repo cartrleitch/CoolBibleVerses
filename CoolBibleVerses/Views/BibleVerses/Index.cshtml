@@ -35,6 +35,11 @@
             <th>
                 @Html.DisplayNameFor(model => model.Details)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Text)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => VerseTag.Tag)
             <th></th>
         </tr>
     </thead>
@@ -53,6 +58,12 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Details)
             </td>
+            <td>
+                @foreach (var tag in item.VerseTags)
+                {
+                    <span class="badge badge-primary">@tag.Tag</span>
+                }
+                </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

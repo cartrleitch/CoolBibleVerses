@@ -11,5 +11,6 @@ namespace CoolBibleVerses.Data
         {
         }
         public DbSet<CoolBibleVerses.Models.BibleVerse> BibleVerse { get; set; } = default!;
+        public DbSet<CoolBibleVerses.Models.VerseTag> VerseTag { get; set; }
     }
 }
