@@ -56,10 +56,13 @@ namespace CoolBibleVerses.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Book,Chapter,Verse,Text")] BibleVerse bibleVerse)
+        public async Task<IActionResult> Create([Bind("Id,Book,Chapter,Verse,Details")] BibleVerse bibleVerse)
         {
+            Console.WriteLine(bibleVerse.Text);
+            Console.WriteLine("Helloooooo");
             if (ModelState.IsValid)
             {
+                bibleVerse.Text = "This is a placeholder text for the verse.";
                 _context.Add(bibleVerse);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

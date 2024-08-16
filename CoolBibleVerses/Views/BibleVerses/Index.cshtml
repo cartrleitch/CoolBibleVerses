@@ -33,7 +33,7 @@
                 @Html.DisplayNameFor(model => model.Verse)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Text)
+                @Html.DisplayNameFor(model => model.Details)
             </th>
             <th></th>
         </tr>
@@ -51,7 +51,7 @@
                 @Html.DisplayFor(modelItem => item.Verse)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Text)
+                @Html.DisplayFor(modelItem => item.Details)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
