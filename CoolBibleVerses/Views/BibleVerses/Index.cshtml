@@ -35,6 +35,12 @@
             <th>
                 @Html.DisplayNameFor(model => model.Details)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Text)
+            </th>
+            <th>
+                Tags
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -51,7 +57,30 @@
                 @Html.DisplayFor(modelItem => item.Verse)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Details)
+                <div class="verse-table-cell cut-text">
+                    @Html.DisplayFor(modelItem => item.Details)
+                </div>
+            </td>
+            <td>
+                <div class="verse-table-cell cut-text">
+                    @Html.DisplayFor(modelItem => item.Text)
+                </div>
+            </td>
+            <td>
+                @{int curTag = 0;}
+                @foreach (var tag in item.VerseTags)
+                {
+                        
+                    if (curTag > 0)
+                    {
+                        <span> @tag.Tag</span>
+                    }
+                    else
+                    {
+                        <span>@tag.Tag</span>
+                    }
+                    curTag++;
+                }
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

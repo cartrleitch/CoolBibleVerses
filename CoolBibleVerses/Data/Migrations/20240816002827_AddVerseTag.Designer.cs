@@ -4,6 +4,7 @@ using CoolBibleVerses.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoolBibleVerses.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240816002827_AddVerseTag")]
+    partial class AddVerseTag
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -279,7 +282,7 @@ namespace CoolBibleVerses.Data.Migrations
             modelBuilder.Entity("CoolBibleVerses.Models.VerseTag", b =>
                 {
                     b.HasOne("CoolBibleVerses.Models.BibleVerse", "BibleVerse")
-                        .WithMany("VerseTags")
+                        .WithMany()
                         .HasForeignKey("BibleVerseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -336,11 +339,6 @@ namespace CoolBibleVerses.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("CoolBibleVerses.Models.BibleVerse", b =>
-                {
-                    b.Navigation("VerseTags");
                 });
 #pragma warning restore 612, 618
         }
