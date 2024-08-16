@@ -8,7 +8,7 @@
         public int Verse { get; set; }
         public string? Text { get; set; }
         public string Details { get; set; }
-        public ICollection<VerseTag> VerseTags { get; set; }
+        public ICollection<VerseTag>? VerseTags { get; set; }
         // maybe use ESV API to get the text to populate the Text
 
         public BibleVerse()
