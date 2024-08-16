@@ -8,12 +8,17 @@ using Microsoft.EntityFrameworkCore;
 using CoolBibleVerses.Data;
 using CoolBibleVerses.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Net.Http;
+using System.Text.Json;
+
 
 namespace CoolBibleVerses.Controllers
 {
     public class BibleVersesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private static readonly string apiKey = "0a978d16cd48e5a4bee9e4daa1ccfcaa21a6cd5a";
+        private static readonly string baseUrl = "https://api.esv.org/v3/passage/text/";
 
         public BibleVersesController(ApplicationDbContext context)
         {
@@ -61,11 +66,27 @@ namespace CoolBibleVerses.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Get text from ESV API and set it to the bibleVerse.Text
+                string passage = $"{bibleVerse.Book}+{bibleVerse.Chapter}:{bibleVerse.Verse}";
+
+                HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
+
+                var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=false&include-audio-link=false");
+                response.EnsureSuccessStatusCode();
+
+                string content = await response.Content.ReadAsStringAsync();
+                var jsonDocument = JsonDocument.Parse(content);
+                var passages = jsonDocument.RootElement.GetProperty("passages");
+
+                bibleVerse.Text = passages[0].GetString();
+
                 string[] tagList = Tags.Split(",");
-                bibleVerse.Text = "This is a placeholder text for the verse."; // ESV API call to get text
+
                 _context.Add(bibleVerse);
                 await _context.SaveChangesAsync();
 
+                // Add tags to VerseTag table
                 foreach (var tag in tagList)
                 {
                     var verseTag = new VerseTag

@@ -69,3 +69,11 @@ privacy {
         background-color: #e8e8e8;
         border-color: #e8e8e8;
     }
+
+.cut-text{
+    text-overflow:ellipsis;
+    overflow:hidden;
+    width: 50px;
+    height: 1.2em;
+    white-space: nowrap;
+}
