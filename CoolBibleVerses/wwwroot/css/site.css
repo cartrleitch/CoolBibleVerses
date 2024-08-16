@@ -70,10 +70,14 @@ privacy {
         border-color: #e8e8e8;
     }
 
-.cut-text{
-    text-overflow:ellipsis;
-    overflow:hidden;
-    width: 50px;
-    height: 1.2em;
+.cut-text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 300px;
+    height: 1.5em;
     white-space: nowrap;
+}
+
+.verse-table-cell{
+    max-height: 70px;
 }

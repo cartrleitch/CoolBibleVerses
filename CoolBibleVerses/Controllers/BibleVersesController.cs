@@ -40,7 +40,7 @@ namespace CoolBibleVerses.Controllers
                 return NotFound();
             }
 
-            var bibleVerse = await _context.BibleVerse
+            var bibleVerse = await _context.BibleVerse.Include(v => v.VerseTags)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (bibleVerse == null)
             {
@@ -62,7 +62,7 @@ namespace CoolBibleVerses.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Book,Chapter,Verse,Details,Tags")] BibleVerse bibleVerse, string Tags)
+        public async Task<IActionResult> Create([Bind("Id,Book,Chapter,Verse,Details,Tags")] BibleVerse bibleVerse, string? Tags)
         {
             if (ModelState.IsValid)
             {
@@ -81,22 +81,25 @@ namespace CoolBibleVerses.Controllers
 
                 bibleVerse.Text = passages[0].GetString();
 
-                string[] tagList = Tags.Split(",");
-
                 _context.Add(bibleVerse);
                 await _context.SaveChangesAsync();
 
-                // Add tags to VerseTag table
-                foreach (var tag in tagList)
+                if (Tags is not null)
                 {
-                    var verseTag = new VerseTag
+                    string[] tagList = Tags.Split(",");
+
+                    // Add tags to VerseTag table
+                    foreach (var tag in tagList)
                     {
-                        Tag = tag.ToLower().Trim(),
-                        BibleVerseId = bibleVerse.Id
-                    };
-                    _context.VerseTag.Add(verseTag);
+                        var verseTag = new VerseTag
+                        {
+                            Tag = tag.ToLower().Trim(),
+                            BibleVerseId = bibleVerse.Id
+                        };
+                        _context.VerseTag.Add(verseTag);
+                    }
+                    await _context.SaveChangesAsync();
                 }
-                await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
             }

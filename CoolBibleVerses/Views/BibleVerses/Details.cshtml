@@ -40,6 +40,27 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Text)
         </dd>
+        <dt class="col-sm-2">
+            Tags
+        </dt>
+        <dd class="col-sm-10">
+            @{
+                int curTag = 0;
+            }
+            @foreach (var tag in Model.VerseTags)
+            {
+
+                if (curTag > 0)
+                {
+                    <span> @tag.Tag</span>
+                }
+                else
+                {
+                    <span>@tag.Tag</span>
+                }
+                curTag++;
+            }
+        </dd>
     </dl>
 </div>
 <div>

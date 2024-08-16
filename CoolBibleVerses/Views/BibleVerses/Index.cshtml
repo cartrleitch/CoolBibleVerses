@@ -57,10 +57,14 @@
                 @Html.DisplayFor(modelItem => item.Verse)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Details)
+                <div class="verse-table-cell cut-text">
+                    @Html.DisplayFor(modelItem => item.Details)
+                </div>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Text)
+                <div class="verse-table-cell cut-text">
+                    @Html.DisplayFor(modelItem => item.Text)
+                </div>
             </td>
             <td>
                 @{int curTag = 0;}
