@@ -57,15 +57,16 @@ namespace CoolBibleVerses.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Book,Chapter,Verse,Details,Tags")] BibleVerse bibleVerse, string[] Tags)
+        public async Task<IActionResult> Create([Bind("Id,Book,Chapter,Verse,Details,Tags")] BibleVerse bibleVerse, string Tags)
         {
             if (ModelState.IsValid)
             {
+                string[] tagList = Tags.Split(",");
                 bibleVerse.Text = "This is a placeholder text for the verse."; // ESV API call to get text
                 _context.Add(bibleVerse);
                 await _context.SaveChangesAsync();
 
-                foreach (var tag in Tags)
+                foreach (var tag in tagList)
                 {
                     var verseTag = new VerseTag
                     {
