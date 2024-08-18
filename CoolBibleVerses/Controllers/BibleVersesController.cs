@@ -42,6 +42,7 @@ namespace CoolBibleVerses.Controllers
 
             var bibleVerse = await _context.BibleVerse.Include(v => v.VerseTags)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (bibleVerse == null)
             {
                 return NotFound();
@@ -115,11 +116,15 @@ namespace CoolBibleVerses.Controllers
                 return NotFound();
             }
 
-            var bibleVerse = await _context.BibleVerse.FindAsync(id);
+            var bibleVerse = await _context.BibleVerse
+            .Include(bv => bv.VerseTags)
+            .FirstOrDefaultAsync(m => m.Id == id);
+
             if (bibleVerse == null)
             {
                 return NotFound();
             }
+
             return View(bibleVerse);
         }
 
@@ -129,7 +134,7 @@ namespace CoolBibleVerses.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Book,Chapter,Verse,Text")] BibleVerse bibleVerse)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Book,Chapter,Verse,Details,Tags")] BibleVerse bibleVerse, string? Tags)
         {
             if (id != bibleVerse.Id)
             {
@@ -141,6 +146,26 @@ namespace CoolBibleVerses.Controllers
                 try
                 {
                     _context.Update(bibleVerse);
+                    await _context.SaveChangesAsync();
+
+                    var curTags = _context.VerseTag.Where(vt => vt.BibleVerseId == bibleVerse.Id).ToList();
+                    _context.VerseTag.RemoveRange(curTags);
+                    Console.WriteLine(Tags);
+                    if (!string.IsNullOrEmpty(Tags))
+                    {
+                        string[] tagList = Tags.Split(",");
+
+                        // Add tags to VerseTag table
+                        foreach (var tag in tagList)
+                        {
+                            var verseTag = new VerseTag
+                            {
+                                Tag = tag.ToLower().Trim(),
+                                BibleVerseId = bibleVerse.Id
+                            };
+                            _context.VerseTag.Add(verseTag);
+                        }
+                    }
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

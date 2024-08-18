@@ -68,18 +68,21 @@
             </td>
             <td>
                 @{int curTag = 0;}
-                @foreach (var tag in item.VerseTags)
-                {
-                        
-                    if (curTag > 0)
-                    {
-                        <span> @tag.Tag</span>
+                @{
+                    if (item.VerseTags != null){
+                        foreach (var tag in item.VerseTags)
+                        {
+                            if (curTag > 0)
+                            {
+                                <span>- @tag.Tag</span>
+                            }
+                            else
+                            {
+                                <span>@tag.Tag</span>
+                            }
+                            curTag++;
+                        }
                     }
-                    else
-                    {
-                        <span>@tag.Tag</span>
-                    }
-                    curTag++;
                 }
             </td>
             <td>
