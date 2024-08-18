@@ -29,9 +29,21 @@
                 <span asp-validation-for="Verse" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Text" class="control-label"></label>
-                <input asp-for="Text" class="form-control" />
-                <span asp-validation-for="Text" class="text-danger"></span>
+                <label asp-for="Details" class="control-label"></label>
+                <input asp-for="Details" class="form-control" />
+                <span asp-validation-for="Details" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                @{
+                    string tagInput = "";
+
+                    if (Model.VerseTags != null)
+                    {
+                        tagInput = string.Join(",", Model.VerseTags.Select(tag => tag.Tag));
+                    }
+                }
+                <label for="Tags" class="control-label">Tags (separate with commas)</label>
+                <input type="text" id="Tags" name="Tags" value ="@tagInput" class="form-control" />
             </div>
             <p></p>
             <div class="form-group">
