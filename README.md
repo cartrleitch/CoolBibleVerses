@@ -5,8 +5,7 @@ Todo:
 4. Record when and by whom a verse was entered
 5. Delegate permissions to add and delete, requiring manual verification or something.
 6. Limit and clean inputs
-7. Verse of the day on welcome page
-8. Make it look nice
+7. Make it look nice
     Fix styling on account manage pages
     Do something nice on the welcome page
-9. Deploy on Pi
+8. Deploy on Pi
