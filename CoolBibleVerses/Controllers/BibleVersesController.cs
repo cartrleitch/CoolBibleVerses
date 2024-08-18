@@ -160,7 +160,7 @@ namespace CoolBibleVerses.Controllers
 
         public async Task<IActionResult> ShowSearchResults(String SearchTerm)
         {
-            return View("Index", await _context.BibleVerse.Where(v=>v.Text.Contains(SearchTerm)).ToListAsync()); ;
+            return View("Index", await _context.BibleVerse.Where(v => v.Text.Contains(SearchTerm) || v.Details.Contains(SearchTerm)).ToListAsync());
         }
 
         private bool BibleVerseExists(int id)
