@@ -221,7 +221,10 @@ namespace CoolBibleVerses.Controllers
 
         public async Task<IActionResult> ShowSearchResults(String SearchTerm)
         {
-            return View("Index", await _context.BibleVerse.Where(v=>v.Text.Contains(SearchTerm)).ToListAsync()); ;
+            string searchTerm = SearchTerm.ToLower();
+            return View("Index", await _context.BibleVerse.Where(v => v.Text.ToLower().Contains(searchTerm) || v.Details.ToLower().Contains(searchTerm) 
+            || (searchTerm.Contains(v.Book.ToLower()) && searchTerm.Contains(v.Chapter.ToString().ToLower()) && searchTerm.Contains(v.Verse.ToString().ToLower())))
+                .ToListAsync());
         }
 
         private bool BibleVerseExists(int id)
