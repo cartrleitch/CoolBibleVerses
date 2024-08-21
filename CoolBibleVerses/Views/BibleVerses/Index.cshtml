@@ -67,23 +67,15 @@
                 </div>
             </td>
             <td>
-                @{int curTag = 0;}
                 @{
-                    if (item.VerseTags != null){
-                        foreach (var tag in item.VerseTags)
-                        {
-                            if (curTag > 0)
-                            {
-                                <span>- @tag.Tag</span>
-                            }
-                            else
-                            {
-                                <span>@tag.Tag</span>
-                            }
-                            curTag++;
-                        }
+                    string tagInput = "";
+
+                    if (item.VerseTags != null)
+                    {
+                        tagInput = string.Join(", ", item.VerseTags.Select(tag => tag.Tag));
                     }
                 }
+                <span>@tagInput</span>
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

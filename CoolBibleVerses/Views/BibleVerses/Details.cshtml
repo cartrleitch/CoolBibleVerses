@@ -45,21 +45,14 @@
         </dt>
         <dd class="col-sm-10">
             @{
-                int curTag = 0;
-            }
-            @foreach (var tag in Model.VerseTags)
-            {
+                string tagInput = "";
 
-                if (curTag > 0)
+                if (Model.VerseTags != null)
                 {
-                    <span> @tag.Tag</span>
+                    tagInput = string.Join(", ", Model.VerseTags.Select(tag => tag.Tag));
                 }
-                else
-                {
-                    <span>@tag.Tag</span>
-                }
-                curTag++;
             }
+            <span>@tagInput</span>
         </dd>
     </dl>
 </div>
