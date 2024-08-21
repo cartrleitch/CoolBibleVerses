@@ -28,7 +28,7 @@ namespace CoolBibleVerses.Controllers
         // GET: BibleVerses
         public async Task<IActionResult> Index()
         {   
-            var bibleVerses = await _context.BibleVerse.Include(v => v.VerseTags).ToListAsync();
+            var bibleVerses = await _context.BibleVerse.Include(v => v.VerseTags).OrderBy(v => v.Book).ToListAsync();
             return View(bibleVerses);
         }
 
