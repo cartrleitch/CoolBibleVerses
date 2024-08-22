@@ -11,29 +11,48 @@
     <h4>BibleVerse</h4>
     <hr />
     <dl class="row">
-        @* <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Book)
+        <dt class="col-sm-2">
+            Book
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Book)
-        </dd> *@
-        <dt class = "col-sm-2">
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.BibleBook.bookName)
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Chapter)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Chapter)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Verse)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Verse)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Details)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Details)
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Text)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Text)
+        </dd>
+        <dt class="col-sm-2">
+            Tags
+        </dt>
+        <dd class="col-sm-10">
+            @{
+                string tags = "";
+                if (Model.VerseTags != null)
+                {
+                    tags = string.Join(", ", Model.VerseTags.Select(t => t.Tag.tagText));
+                }
+            }
+            <span>@tags</span>
         </dd>
     </dl>
     

@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace CoolBibleVerses.Data.Migrations
+namespace CoolBibleVerses.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240821235155_db-refactor-2.5")]
-    partial class dbrefactor25
+    [Migration("20240822012852_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,7 +50,7 @@ namespace CoolBibleVerses.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BookId")
+                    b.Property<int>("BibleBookId")
                         .HasColumnType("int");
 
                     b.Property<int>("Chapter")

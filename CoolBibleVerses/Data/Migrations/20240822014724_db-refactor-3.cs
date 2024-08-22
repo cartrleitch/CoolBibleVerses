@@ -2,27 +2,27 @@
 
 #nullable disable
 
-namespace CoolBibleVerses.Data.Migrations
+namespace CoolBibleVerses.Migrations
 {
     /// <inheritdoc />
-    public partial class dbrefactor25 : Migration
+    public partial class dbrefactor3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
-                name: "bookId",
-                table: "BibleVerse",
-                newName: "BookId");
+                name: "tagtext",
+                table: "Tag",
+                newName: "tagText");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
-                name: "BookId",
-                table: "BibleVerse",
-                newName: "bookId");
+                name: "tagText",
+                table: "Tag",
+                newName: "tagtext");
         }
     }
 }
