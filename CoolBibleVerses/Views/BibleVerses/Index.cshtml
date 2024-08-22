@@ -24,7 +24,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Book)
+                @* @Html.DisplayNameFor(model => model.Book) *@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Chapter)
@@ -48,7 +48,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Book)
+                @* @Html.DisplayFor(modelItem => item.Book) *@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Chapter)
@@ -72,7 +72,7 @@
 
                     if (item.VerseTags != null)
                     {
-                        tagInput = string.Join(", ", item.VerseTags.Select(tag => tag.Tag));
+                        tagInput = string.Join(", ", item.VerseTags.Select(tag => tag.TagId));
                     }
                 }
                 <span>@tagInput</span>

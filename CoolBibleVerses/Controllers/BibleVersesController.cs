@@ -28,7 +28,7 @@ namespace CoolBibleVerses.Controllers
         // GET: BibleVerses
         public async Task<IActionResult> Index()
         {   
-            var bibleVerses = await _context.BibleVerse.Include(v => v.VerseTags).OrderBy(v => v.Book).ToListAsync();
+            var bibleVerses = await _context.BibleVerse.Include(v => v.VerseTags).ToListAsync();
             return View(bibleVerses);
         }
 
@@ -68,7 +68,7 @@ namespace CoolBibleVerses.Controllers
             if (ModelState.IsValid)
             {
                 // Get text from ESV API and set it to the bibleVerse.Text
-                string passage = $"{bibleVerse.Book}+{bibleVerse.Chapter}:{bibleVerse.Verse}";
+                /*string passage = $"{bibleVerse.Book}+{bibleVerse.Chapter}:{bibleVerse.Verse}";
 
                 HttpClient client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
@@ -83,21 +83,21 @@ namespace CoolBibleVerses.Controllers
                 bibleVerse.Text = passages[0].GetString();
 
                 _context.Add(bibleVerse);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();*/
 
                 if (Tags is not null)
                 {
                     string[] tagList = Tags.Split(",");
 
                     // Add tags to VerseTag table
+                    // Add tags to VerseTag table
                     foreach (var tag in tagList)
                     {
-                        var verseTag = new VerseTag
+                        var newTag = new Tag
                         {
-                            Tag = tag.ToLower().Trim(),
-                            BibleVerseId = bibleVerse.Id
+                            tagtext = tag.ToLower().Trim(),
                         };
-                        _context.VerseTag.Add(verseTag);
+                        //_context.Tag.Add(newTag);
                     }
                     await _context.SaveChangesAsync();
                 }
@@ -158,12 +158,11 @@ namespace CoolBibleVerses.Controllers
                         // Add tags to VerseTag table
                         foreach (var tag in tagList)
                         {
-                            var verseTag = new VerseTag
+                            var newTag = new Tag
                             {
-                                Tag = tag.ToLower().Trim(),
-                                BibleVerseId = bibleVerse.Id
+                                tagtext = tag.ToLower().Trim(),
                             };
-                            _context.VerseTag.Add(verseTag);
+                            //_context.Tag.Add(newTag);
                         }
                     }
                     await _context.SaveChangesAsync();
@@ -222,10 +221,7 @@ namespace CoolBibleVerses.Controllers
         public async Task<IActionResult> ShowSearchResults(String SearchTerm)
         {
             string searchTerm = SearchTerm.ToLower();
-            return View("Index", await _context.BibleVerse.Include(bv => bv.VerseTags).Where(v => v.VerseTags.Any(vt => vt.Tag.ToLower() == searchTerm) ||
-            v.Text.ToLower().Contains(searchTerm) || v.Details.ToLower().Contains(searchTerm) 
-            || (searchTerm.Contains(v.Book.ToLower()) && searchTerm.Contains(v.Chapter.ToString().ToLower()) && searchTerm.Contains(v.Verse.ToString().ToLower())))
-                .ToListAsync());
+            return View("Index", await _context.BibleVerse.Include(bv => bv.VerseTags).ToListAsync());
         }
 
         private bool BibleVerseExists(int id)

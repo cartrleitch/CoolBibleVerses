@@ -4,6 +4,7 @@ using CoolBibleVerses.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoolBibleVerses.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240821234941_db-refactor-2")]
+    partial class dbrefactor2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,9 +50,6 @@ namespace CoolBibleVerses.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BibleBookId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Chapter")
                         .HasColumnType("int");
 
@@ -61,6 +61,9 @@ namespace CoolBibleVerses.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Verse")
+                        .HasColumnType("int");
+
+                    b.Property<int>("bookId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
