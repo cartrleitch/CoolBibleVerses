@@ -14,5 +14,20 @@ namespace CoolBibleVerses.Data
         public DbSet<CoolBibleVerses.Models.VerseTag> VerseTag { get; set; }
         public DbSet<CoolBibleVerses.Models.Tag> Tag { get; set; }
         public DbSet<CoolBibleVerses.Models.BibleBook> BibleBook { get; set; }
+        
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<BibleVerse>().ToTable("BibleVerse");
+            modelBuilder.Entity<VerseTag>().ToTable("VerseTag");
+            modelBuilder.Entity<Tag>().ToTable("Tag");
+            modelBuilder.Entity<BibleBook>().ToTable("BibleBook");
+
+            modelBuilder.Entity<VerseTag>()
+                .HasKey(vt => new { vt.TagId, vt.BibleVerseId });
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
+
+    
 }

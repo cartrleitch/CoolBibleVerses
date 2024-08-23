@@ -70,45 +70,9 @@ namespace CoolBibleVerses.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Book, Chapter,Verse,Details,Tags")] BibleVerse bibleVerse, string? Tags, string Book)
+        public async Task<IActionResult> Create([Bind("Id,Book,Chapter,Verse,Details,Tags")] BibleVerse bibleVerse, Tag tag, string? Tags, string Book)
         {
-            Console.WriteLine("Out Valid");
-            if (ModelState.IsValid)
-            {
-                Console.WriteLine("Valid");
-                var book = _context.BibleBook.FirstOrDefault(b => b.bookName == Book);
-                if (book is null)
-                {
-                    book = new BibleBook
-                    {
-                        bookName = Book
-                    };
-                    _context.Add(book);
-                    await _context.SaveChangesAsync();
-                }
-                Console.WriteLine(bibleVerse.BibleBook.bookName);
-
-                if (Tags is not null)
-                {
-                    string[] tagList = Tags.Split(",");
-
-                    // Add tags to VerseTag and Tag tables
-                    foreach (var tag in tagList)
-                    {
-                        var currentTag = _context.Tag.FirstOrDefault(t => t.tagText == tag);
-
-                        if (currentTag is null)
-                        {
-                            var newTag = new Tag
-                            {
-                                tagText = tag.ToLower().Trim(),
-                            };
-                            _context.Add(newTag);
-                        }
-                        await _context.SaveChangesAsync();
-                    }
-                }
-
+            if (ModelState.IsValid) { 
                 // Get text from ESV API and set it to the bibleVerse.Text
                 string passage = $"{Book}+{bibleVerse.Chapter}:{bibleVerse.Verse}";
 
@@ -123,8 +87,6 @@ namespace CoolBibleVerses.Controllers
                 var passages = jsonDocument.RootElement.GetProperty("passages");
 
                 bibleVerse.Text = passages[0].GetString();
-
-                bibleVerse.BibleBookId = book.Id;
 
                 _context.Add(bibleVerse);
                 await _context.SaveChangesAsync();
