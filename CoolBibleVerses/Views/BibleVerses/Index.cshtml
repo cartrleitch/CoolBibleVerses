@@ -5,26 +5,20 @@
 }
 
 <h1>All Verses</h1>
-<p></p>
-<p>
+<form asp-action="ShowSearchResults" style="display:inline; padding-top: 20px">
+    <label for="SearchTerm" style="display:inline; padding-right:10px">Search for verse:</label>
+    <input name="SearchTerm" class="form-control" style="display:inline; width:70%" />
+    <input type="submit" value="Search" class="button-primary" style="display:inline;" />
+</form>
+<p style="padding-top:20px">
     <a asp-action="Create" class="button-primary">Create New</a>
 </p>
-<form asp-action="ShowSearchResults">
-    <div>
-        <label for="SearchTerm">Search for verse:</label>
-        <input name="SearchTerm" class="form-control" style="width:75%" /> 
-    </div>
-    <div>
-        <p></p>
-        <input type="submit" value="Search" class="button-primary" />
-    </div>
-</form>
 
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Book)
+                Book
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Chapter)
@@ -48,7 +42,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Book)
+                @Html.DisplayFor(model => item.BibleBook.bookName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Chapter)
@@ -65,17 +59,16 @@
                 <div class="verse-table-cell cut-text">
                     @Html.DisplayFor(modelItem => item.Text)
                 </div>
-            </td>
+            </td>                
             <td>
                 @{
-                    string tagInput = "";
-
+                    string tags = "";
                     if (item.VerseTags != null)
                     {
-                        tagInput = string.Join(", ", item.VerseTags.Select(tag => tag.Tag));
+                    tags = string.Join(", ", item.VerseTags.Select(t => t.Tag.tagText));
                     }
                 }
-                <span>@tagInput</span>
+                <span>@tags</span>
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

@@ -10,6 +10,9 @@ using CoolBibleVerses.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Http;
 using System.Text.Json;
+using Microsoft.IdentityModel.Tokens;
+using System.ComponentModel;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 
 namespace CoolBibleVerses.Controllers
@@ -28,7 +31,11 @@ namespace CoolBibleVerses.Controllers
         // GET: BibleVerses
         public async Task<IActionResult> Index()
         {   
-            var bibleVerses = await _context.BibleVerse.Include(v => v.VerseTags).OrderBy(v => v.Book).ToListAsync();
+            var bibleVerses = await _context.BibleVerse
+                .Include(v => v.VerseTags)
+                    .ThenInclude(vt => vt.Tag)
+                .Include(bb => bb.BibleBook)
+                .ToListAsync();
             return View(bibleVerses);
         }
 
@@ -40,7 +47,10 @@ namespace CoolBibleVerses.Controllers
                 return NotFound();
             }
 
-            var bibleVerse = await _context.BibleVerse.Include(v => v.VerseTags)
+            var bibleVerse = await _context.BibleVerse
+                .Include(v => v.VerseTags)
+                    .ThenInclude(vt => vt.Tag)
+                .Include(bb => bb.BibleBook)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (bibleVerse == null)
@@ -53,8 +63,9 @@ namespace CoolBibleVerses.Controllers
 
         // GET: BibleVerses/Create
         [Authorize]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewBag.BibleBooks = await _context.BibleBook.ToListAsync();
             return View();
         }
 
@@ -63,47 +74,105 @@ namespace CoolBibleVerses.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Book,Chapter,Verse,Details,Tags")] BibleVerse bibleVerse, string? Tags)
+        public async Task<IActionResult> Create([Bind("Chapter,Verse,Details")] BibleVerse bibleVerse, string? Tags, string Book)
         {
-            if (ModelState.IsValid)
+            foreach (var state in ModelState)
             {
-                // Get text from ESV API and set it to the bibleVerse.Text
-                string passage = $"{bibleVerse.Book}+{bibleVerse.Chapter}:{bibleVerse.Verse}";
-
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
-
-                var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=false&include-audio-link=false");
-                response.EnsureSuccessStatusCode();
-
-                string content = await response.Content.ReadAsStringAsync();
-                var jsonDocument = JsonDocument.Parse(content);
-                var passages = jsonDocument.RootElement.GetProperty("passages");
-
-                bibleVerse.Text = passages[0].GetString();
-
-                _context.Add(bibleVerse);
-                await _context.SaveChangesAsync();
-
-                if (Tags is not null)
+                foreach (var error in state.Value.Errors)
                 {
-                    string[] tagList = Tags.Split(",");
-
-                    // Add tags to VerseTag table
-                    foreach (var tag in tagList)
-                    {
-                        var verseTag = new VerseTag
-                        {
-                            Tag = tag.ToLower().Trim(),
-                            BibleVerseId = bibleVerse.Id
-                        };
-                        _context.VerseTag.Add(verseTag);
-                    }
-                    await _context.SaveChangesAsync();
+                    Console.WriteLine($"Property: {state.Key}, Error: {error.ErrorMessage}");
                 }
-
-                return RedirectToAction(nameof(Index));
             }
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Get BibleBookId from BibleBook table
+                    if (Book is not null)
+                    {
+                        string bibleBookName = (Char.ToUpper(Book[0]) + Book.Substring(1).ToLower()).Trim();
+                        var bibleBook = _context.BibleBook.Where(bb => bb.bookName == bibleBookName).FirstOrDefault();
+                        if (bibleBook is null)
+                        {
+                            bibleVerse.BibleBookId = 0;
+                        }
+                        else
+                        {
+                            bibleVerse.BibleBookId = bibleBook.Id;
+                        }
+                    }
+
+                    // Get text from ESV API and set it to the bibleVerse.Text
+                    string passage = $"{Book}+{bibleVerse.Chapter}:{bibleVerse.Verse}";
+
+                    HttpClient client = new HttpClient();
+                    client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
+
+                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=false&include-audio-link=false");
+                    response.EnsureSuccessStatusCode();
+
+                    string content = await response.Content.ReadAsStringAsync();
+                    var jsonDocument = JsonDocument.Parse(content);
+                    var passages = jsonDocument.RootElement.GetProperty("passages");
+
+                    bibleVerse.Text = passages[0].GetString();
+
+                    _context.Add(bibleVerse);
+                    await _context.SaveChangesAsync();
+
+                    if (Tags is not null)
+                    {
+                        // Add tags to Tag table (adds if none exist)
+                        List<int> tagIds = new List<int>();
+                        string[] tagList = Tags.Split(",");
+                        var dbTags = _context.Tag.ToList();
+
+                        foreach (var tag in tagList)
+                        {
+                            var existingTag = dbTags.FirstOrDefault(t => t.tagText == tag.ToLower().Trim());
+                            if (existingTag == null)
+                            {
+                                var newTag = new Tag
+                                {
+                                    tagText = tag.ToLower().Trim(),
+                                };
+                                _context.Tag.Add(newTag);
+                                await _context.SaveChangesAsync();
+                                tagIds.Add(newTag.Id);
+                            }
+                            else
+                            {
+                                tagIds.Add(existingTag.Id);
+                            }
+
+                        }
+
+                        bibleVerse.VerseTags = new List<VerseTag>();
+
+                        // Add tags to VerseTag table
+                        foreach (var tagId in tagIds)
+                        {
+                            var newVerseTag = new VerseTag
+                            {
+                                BibleVerseId = bibleVerse.Id,
+                                TagId = tagId
+
+                            };
+                            _context.VerseTag.Add(newVerseTag);
+                        }
+                        await _context.SaveChangesAsync();
+                    }
+
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (DbUpdateException dbexcept)
+            {
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.");
+            }
+            ViewBag.BibleBooks = await _context.BibleBook.ToListAsync();
             return View(bibleVerse);
         }
 
@@ -115,10 +184,13 @@ namespace CoolBibleVerses.Controllers
             {
                 return NotFound();
             }
+            ViewBag.BibleBooks = await _context.BibleBook.ToListAsync();
 
             var bibleVerse = await _context.BibleVerse
-            .Include(bv => bv.VerseTags)
-            .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(v => v.VerseTags)
+                    .ThenInclude(vt => vt.Tag)
+                .Include(bb => bb.BibleBook)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (bibleVerse == null)
             {
@@ -134,7 +206,7 @@ namespace CoolBibleVerses.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Book,Chapter,Verse,Details,Tags")] BibleVerse bibleVerse, string? Tags)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BibleBookId,Chapter,Verse,Details,VerseTags,BibleBook")] BibleVerse bibleVerse, string? Tags, string Book)
         {
             if (id != bibleVerse.Id)
             {
@@ -143,30 +215,89 @@ namespace CoolBibleVerses.Controllers
 
             if (ModelState.IsValid)
             {
+                Console.WriteLine("valid");
                 try
                 {
+                    // Get BibleBookId from BibleBook table
+                    if (Book is not null)
+                    {
+                        string bibleBookName = (Char.ToUpper(Book[0]) + Book.Substring(1).ToLower()).Trim();
+                        var bibleBook = _context.BibleBook.Where(bb => bb.bookName == bibleBookName).FirstOrDefault();
+                        if (bibleBook is null)
+                        {
+                            bibleVerse.BibleBookId = 0;
+                        }
+                        else
+                        {
+                            bibleVerse.BibleBookId = bibleBook.Id;
+                        }
+                    }
+
+                    // Get text from ESV API and set it to the bibleVerse.Text
+                    string passage = $"{Book}+{bibleVerse.Chapter}:{bibleVerse.Verse}";
+
+                    HttpClient client = new HttpClient();
+                    client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
+
+                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=false&include-audio-link=false");
+                    response.EnsureSuccessStatusCode();
+
+                    string content = await response.Content.ReadAsStringAsync();
+                    var jsonDocument = JsonDocument.Parse(content);
+                    var passages = jsonDocument.RootElement.GetProperty("passages");
+
+                    bibleVerse.Text = passages[0].GetString();
+                    
+                    var verseTags = _context.VerseTag.Where(vt => vt.BibleVerseId == bibleVerse.Id);
+
+                    if (!verseTags.IsNullOrEmpty())
+                    {
+                        _context.VerseTag.RemoveRange(verseTags);
+                    }                    
                     _context.Update(bibleVerse);
                     await _context.SaveChangesAsync();
 
-                    var curTags = _context.VerseTag.Where(vt => vt.BibleVerseId == bibleVerse.Id).ToList();
-                    _context.VerseTag.RemoveRange(curTags);
-                    Console.WriteLine(Tags);
-                    if (!string.IsNullOrEmpty(Tags))
+                    if (Tags is not null)
                     {
+                        // Add tags to Tag table (adds if none exist)
+                        List<int> tagIds = new List<int>();
                         string[] tagList = Tags.Split(",");
+                        var dbTags = _context.Tag.ToList();
 
-                        // Add tags to VerseTag table
                         foreach (var tag in tagList)
                         {
-                            var verseTag = new VerseTag
+                            var existingTag = dbTags.FirstOrDefault(t => t.tagText == tag.ToLower().Trim());
+                            if (existingTag == null)
                             {
-                                Tag = tag.ToLower().Trim(),
-                                BibleVerseId = bibleVerse.Id
-                            };
-                            _context.VerseTag.Add(verseTag);
+                                var newTag = new Tag
+                                {
+                                    tagText = tag.ToLower().Trim(),
+                                };
+                                _context.Tag.Add(newTag);
+                                await _context.SaveChangesAsync();
+                                tagIds.Add(newTag.Id);
+                            }
+                            else
+                            {
+                                tagIds.Add(existingTag.Id);
+                            }
                         }
+
+                        bibleVerse.VerseTags = new List<VerseTag>();
+
+                        // Add tags to VerseTag table
+                        foreach (var tagId in tagIds)
+                        {
+                            var newVerseTag = new VerseTag
+                            {
+                                BibleVerseId = bibleVerse.Id,
+                                TagId = tagId
+
+                            };
+                            _context.VerseTag.Add(newVerseTag);
+                        }
+                        await _context.SaveChangesAsync();
                     }
-                    await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -194,7 +325,11 @@ namespace CoolBibleVerses.Controllers
             }
 
             var bibleVerse = await _context.BibleVerse
-                .FirstOrDefaultAsync(m => m.Id == id);
+                 .Include(v => v.VerseTags)
+                     .ThenInclude(vt => vt.Tag)
+                 .Include(bb => bb.BibleBook)
+                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (bibleVerse == null)
             {
                 return NotFound();
@@ -209,10 +344,19 @@ namespace CoolBibleVerses.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var bibleVerse = await _context.BibleVerse.FindAsync(id);
+            var bibleVerse = await _context.BibleVerse
+                .Include(v => v.VerseTags)
+                    .ThenInclude(vt => vt.Tag)
+                .Include(bb => bb.BibleBook)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (bibleVerse != null)
             {
                 _context.BibleVerse.Remove(bibleVerse);
+            }
+            if (bibleVerse.VerseTags != null)
+            {
+                _context.VerseTag.RemoveRange(bibleVerse.VerseTags);
             }
 
             await _context.SaveChangesAsync();
@@ -222,10 +366,7 @@ namespace CoolBibleVerses.Controllers
         public async Task<IActionResult> ShowSearchResults(String SearchTerm)
         {
             string searchTerm = SearchTerm.ToLower();
-            return View("Index", await _context.BibleVerse.Include(bv => bv.VerseTags).Where(v => v.VerseTags.Any(vt => vt.Tag.ToLower() == searchTerm) ||
-            v.Text.ToLower().Contains(searchTerm) || v.Details.ToLower().Contains(searchTerm) 
-            || (searchTerm.Contains(v.Book.ToLower()) && searchTerm.Contains(v.Chapter.ToString().ToLower()) && searchTerm.Contains(v.Verse.ToString().ToLower())))
-                .ToListAsync());
+            return View("Index", await _context.BibleVerse.Include(bv => bv.VerseTags).ToListAsync());
         }
 
         private bool BibleVerseExists(int id)

@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace CoolBibleVerses.Data.Migrations
+namespace CoolBibleVerses.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240815232250_RemoveTags")]
-    partial class RemoveTags
+    [Migration("20240822014724_db-refactor-3")]
+    partial class dbrefactor3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,23 @@ namespace CoolBibleVerses.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CoolBibleVerses.Models.BibleBook", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("bookName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BibleBook");
+                });
+
             modelBuilder.Entity("CoolBibleVerses.Models.BibleVerse", b =>
                 {
                     b.Property<int>("Id")
@@ -33,9 +50,8 @@ namespace CoolBibleVerses.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Book")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("BibleBookId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Chapter")
                         .HasColumnType("int");
@@ -45,7 +61,6 @@ namespace CoolBibleVerses.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Text")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Verse")
@@ -53,7 +68,49 @@ namespace CoolBibleVerses.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BibleBookId");
+
                     b.ToTable("BibleVerse");
+                });
+
+            modelBuilder.Entity("CoolBibleVerses.Models.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("tagText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tag");
+                });
+
+            modelBuilder.Entity("CoolBibleVerses.Models.VerseTag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BibleVerseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BibleVerseId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("VerseTag");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -258,6 +315,36 @@ namespace CoolBibleVerses.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("CoolBibleVerses.Models.BibleVerse", b =>
+                {
+                    b.HasOne("CoolBibleVerses.Models.BibleBook", "BibleBook")
+                        .WithMany()
+                        .HasForeignKey("BibleBookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BibleBook");
+                });
+
+            modelBuilder.Entity("CoolBibleVerses.Models.VerseTag", b =>
+                {
+                    b.HasOne("CoolBibleVerses.Models.BibleVerse", "BibleVerse")
+                        .WithMany("VerseTags")
+                        .HasForeignKey("BibleVerseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoolBibleVerses.Models.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BibleVerse");
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -307,6 +394,11 @@ namespace CoolBibleVerses.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("CoolBibleVerses.Models.BibleVerse", b =>
+                {
+                    b.Navigation("VerseTags");
                 });
 #pragma warning restore 612, 618
         }
