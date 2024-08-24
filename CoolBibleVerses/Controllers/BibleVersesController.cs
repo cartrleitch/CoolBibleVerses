@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authorization;
 using System.Net.Http;
 using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
+using System.ComponentModel;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 
 namespace CoolBibleVerses.Controllers
@@ -61,8 +63,9 @@ namespace CoolBibleVerses.Controllers
 
         // GET: BibleVerses/Create
         [Authorize]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewBag.BibleBooks = await _context.BibleBook.ToListAsync();
             return View();
         }
 
@@ -172,7 +175,7 @@ namespace CoolBibleVerses.Controllers
                     "Try again, and if the problem persists " +
                     "see your system administrator.");
             }
-
+            ViewBag.BibleBooks = await _context.BibleBook.ToListAsync();
             return View(bibleVerse);
         }
 
