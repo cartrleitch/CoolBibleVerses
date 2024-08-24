@@ -85,15 +85,18 @@ namespace CoolBibleVerses.Controllers
                 if (ModelState.IsValid)
                 {
                     // Get BibleBookId from BibleBook table
-                    string bibleBookName = (Char.ToUpper(Book[0]) + Book.Substring(1).ToLower()).Trim();
-                    var bibleBook = _context.BibleBook.Where(bb => bb.bookName == bibleBookName).FirstOrDefault();
-                    if (bibleBook is null)
+                    if (Book is not null)
                     {
-                        bibleVerse.BibleBookId = 0;
-                    }
-                    else
-                    {
-                        bibleVerse.BibleBookId = bibleBook.Id;
+                        string bibleBookName = (Char.ToUpper(Book[0]) + Book.Substring(1).ToLower()).Trim();
+                        var bibleBook = _context.BibleBook.Where(bb => bb.bookName == bibleBookName).FirstOrDefault();
+                        if (bibleBook is null)
+                        {
+                            bibleVerse.BibleBookId = 0;
+                        }
+                        else
+                        {
+                            bibleVerse.BibleBookId = bibleBook.Id;
+                        }
                     }
 
                     // Get text from ESV API and set it to the bibleVerse.Text
@@ -287,6 +290,10 @@ namespace CoolBibleVerses.Controllers
             if (bibleVerse != null)
             {
                 _context.BibleVerse.Remove(bibleVerse);
+            }
+            if (bibleVerse.VerseTags != null)
+            {
+                _context.VerseTag.RemoveRange(bibleVerse.VerseTags);
             }
 
             await _context.SaveChangesAsync();
