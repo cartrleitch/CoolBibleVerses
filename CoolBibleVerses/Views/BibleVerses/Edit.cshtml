@@ -14,9 +14,25 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                @* <label asp-for="Book" class="control-label"></label>
-                <input asp-for="Book" class="form-control" />
-                <span asp-validation-for="Book" class="text-danger"></span> *@
+                <label for="Book">Book</label>
+                <select for="Book" name="Book" id="Book" class="form-control" data-val="true" data-val-required="The Book field is required." required>
+                    <option value="" disabled>Select a Book</option>
+                    @{
+                        var currentBook = Model.BibleBook.bookName;
+
+                        foreach (var book in ViewBag.BibleBooks)
+                        {   
+                            if (currentBook == book.bookName)
+                            {
+                                <option value="@book.bookName" selected="selected">@book.bookName</option>
+                            }
+                            else
+                            {
+                                <option value="@book.bookName">@book.bookName</option>
+                            }
+                        }
+                    }
+                </select>
             </div>
             <div class="form-group">
                 <label asp-for="Chapter" class="control-label"></label>
@@ -34,17 +50,17 @@
                 <span asp-validation-for="Details" class="text-danger"></span>
             </div>
             <div class="form-group">
-@*                 @{
+                @{
                     string tagInput = "";
 
                     if (Model.VerseTags != null)
                     {
-                        tagInput = string.Join(",", Model.VerseTags.Select(tag => tag.Tag));
+                        tagInput = string.Join(",", Model.VerseTags.Select(tag => tag.Tag.tagText));
                     }
                 }
                 <label for="Tags" class="control-label">Tags (separate with commas)</label>
                 <input type="text" id="Tags" name="Tags" value ="@tagInput" class="form-control" />
- *@            </div>
+            </div>
             <p></p>
             <div class="form-group">
                 <input type="submit" value="Save" class="button-primary" />
