@@ -35,6 +35,7 @@ namespace CoolBibleVerses.Controllers
                 .Include(v => v.VerseTags)
                     .ThenInclude(vt => vt.Tag)
                 .Include(bb => bb.BibleBook)
+                .OrderBy(bb => bb.BibleBook.Id).ThenBy(bv => bv.Chapter).ThenBy(bv => bv.Verse)
                 .ToListAsync();
             return View(bibleVerses);
         }
@@ -129,12 +130,12 @@ namespace CoolBibleVerses.Controllers
 
                         foreach (var tag in tagList)
                         {
-                            var existingTag = dbTags.FirstOrDefault(t => t.tagText == tag.ToLower().Trim());
+                            var existingTag = dbTags.FirstOrDefault(t => t.tagText == (Char.ToUpper(tag[0]) + tag.Substring(1).ToLower()).Trim());
                             if (existingTag == null)
                             {
                                 var newTag = new Tag
                                 {
-                                    tagText = tag.ToLower().Trim(),
+                                    tagText = (Char.ToUpper(tag[0]) + tag.Substring(1).ToLower()).Trim()
                                 };
                                 _context.Tag.Add(newTag);
                                 await _context.SaveChangesAsync();
@@ -266,12 +267,12 @@ namespace CoolBibleVerses.Controllers
 
                         foreach (var tag in tagList)
                         {
-                            var existingTag = dbTags.FirstOrDefault(t => t.tagText == tag.ToLower().Trim());
+                            var existingTag = dbTags.FirstOrDefault(t => t.tagText == (Char.ToUpper(tag[0]) + tag.Substring(1).ToLower()).Trim());
                             if (existingTag == null)
                             {
                                 var newTag = new Tag
                                 {
-                                    tagText = tag.ToLower().Trim(),
+                                    tagText = (Char.ToUpper(tag[0]) + tag.Substring(1).ToLower()).Trim(),
                                 };
                                 _context.Tag.Add(newTag);
                                 await _context.SaveChangesAsync();
@@ -365,10 +366,26 @@ namespace CoolBibleVerses.Controllers
 
         public async Task<IActionResult> ShowSearchResults(String SearchTerm)
         {
-            string searchTerm = SearchTerm.ToLower();
-            return View("Index", await _context.BibleVerse.Include(bv => bv.VerseTags).ToListAsync());
-        }
+            string searchTerm = "";
+            if (SearchTerm != null)
+            {
+                searchTerm = SearchTerm.ToLower();
+            }
 
+            return View("Index", 
+                await _context.BibleVerse
+                .Where(bv => 
+                SearchTerm.Contains(bv.BibleBook.bookName) && SearchTerm.Contains(bv.Chapter.ToString()) && SearchTerm.Contains(bv.Verse.ToString()) || 
+                bv.VerseTags.Any(vt => (vt.Tag.tagText.ToUpper()).Contains(searchTerm.ToUpper()) || 
+                SearchTerm.Contains(bv.BibleBook.bookName) || 
+                bv.Text.ToLower().Contains(searchTerm) ||
+                bv.Details.ToLower().Contains(searchTerm)))
+                .Include(bv => bv.VerseTags)
+                .ThenInclude(t => t.Tag)
+                .Include(bb => bb.BibleBook).OrderBy(bb => bb.BibleBook.Id).ThenBy(bv => bv.Chapter).ThenBy(bv => bv.Verse)
+                .ToListAsync()
+                );
+        }
         private bool BibleVerseExists(int id)
         {
             return _context.BibleVerse.Any(e => e.Id == id);
