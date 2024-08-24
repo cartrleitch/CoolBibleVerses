@@ -1,6 +1,6 @@
 Todo:
 1. Enable searching by Book-Chapter-Verse, text, or tags
-2. Order search results by relevancy, and order default index view by book, chapter, and verse.
+2. Order search results by relevancy
 3. Allow inputting multiple verses and chapters
 4. Record when and by whom a verse was entered
 5. Delegate permissions to add and delete, requiring manual verification or something.
