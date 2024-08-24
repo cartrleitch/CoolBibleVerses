@@ -7,4 +7,4 @@ Todo:
 6. Make it look nice
     Fix styling on account manage pages
     Do something nice on the welcome page
-7. Deploy on Pi
+7. Deploy on Pi (dockerize and get domain)
