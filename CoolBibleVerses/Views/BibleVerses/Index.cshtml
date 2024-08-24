@@ -5,20 +5,14 @@
 }
 
 <h1>All Verses</h1>
-<p></p>
-<p>
+<form asp-action="ShowSearchResults" style="display:inline; padding-top: 20px">
+    <label for="SearchTerm" style="display:inline; padding-right:10px">Search for verse:</label>
+    <input name="SearchTerm" class="form-control" style="display:inline; width:70%" />
+    <input type="submit" value="Search" class="button-primary" style="display:inline;" />
+</form>
+<p style="padding-top:20px">
     <a asp-action="Create" class="button-primary">Create New</a>
 </p>
-<form asp-action="ShowSearchResults">
-    <div>
-        <label for="SearchTerm">Search for verse:</label>
-        <input name="SearchTerm" class="form-control" style="width:75%" /> 
-    </div>
-    <div>
-        <p></p>
-        <input type="submit" value="Search" class="button-primary" />
-    </div>
-</form>
 
 <table class="table">
     <thead>
