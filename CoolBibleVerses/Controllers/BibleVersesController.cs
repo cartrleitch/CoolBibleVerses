@@ -13,6 +13,7 @@ using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Text.RegularExpressions;
 
 
 namespace CoolBibleVerses.Controllers
@@ -35,6 +36,7 @@ namespace CoolBibleVerses.Controllers
                 .Include(v => v.VerseTags)
                     .ThenInclude(vt => vt.Tag)
                 .Include(bb => bb.BibleBook)
+                .OrderBy(bb => bb.BibleBook.Id).ThenBy(bv => bv.Chapter).ThenBy(bv => bv.Verse)
                 .ToListAsync();
             return View(bibleVerses);
         }
@@ -108,14 +110,24 @@ namespace CoolBibleVerses.Controllers
                     HttpClient client = new HttpClient();
                     client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
 
-                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=false&include-audio-link=false");
+                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=true&include-audio-link=false");
                     response.EnsureSuccessStatusCode();
 
                     string content = await response.Content.ReadAsStringAsync();
                     var jsonDocument = JsonDocument.Parse(content);
                     var passages = jsonDocument.RootElement.GetProperty("passages");
 
+                    var pssg = passages[0].GetString();
+                    var pssgsplit = pssg.Split("\n");
+                    var bcv = pssgsplit[0];
                     bibleVerse.Text = passages[0].GetString();
+                    string currentPassage = Book + " " + bibleVerse.Chapter + ":" + bibleVerse.Verse;
+
+                    if (!bcv.Equals(currentPassage))
+                    {
+                        ViewBag.BibleBooks = await _context.BibleBook.ToListAsync();
+                        return View(bibleVerse);
+                    }
 
                     _context.Add(bibleVerse);
                     await _context.SaveChangesAsync();
@@ -126,19 +138,23 @@ namespace CoolBibleVerses.Controllers
                         List<int> tagIds = new List<int>();
                         string[] tagList = Tags.Split(",");
                         var dbTags = _context.Tag.ToList();
+                        string tText = "";  
 
                         foreach (var tag in tagList)
                         {
-                            var existingTag = dbTags.FirstOrDefault(t => t.tagText == tag.ToLower().Trim());
+                            var existingTag = dbTags.FirstOrDefault(t => t.tagText.ToUpper() == tag.ToUpper().Trim());
                             if (existingTag == null)
                             {
+                                Console.WriteLine(tag);
+                                foreach (var t in Regex.Split(tag.Trim(), @"\s+")) { tText += (Char.ToUpper(t[0]) + t.Substring(1).ToLower()).Trim() + " "; }
                                 var newTag = new Tag
                                 {
-                                    tagText = tag.ToLower().Trim(),
+                                    tagText = tText.Trim()
                                 };
                                 _context.Tag.Add(newTag);
                                 await _context.SaveChangesAsync();
                                 tagIds.Add(newTag.Id);
+                                tText = "";
                             }
                             else
                             {
@@ -239,15 +255,30 @@ namespace CoolBibleVerses.Controllers
                     HttpClient client = new HttpClient();
                     client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
 
-                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=false&include-audio-link=false");
+                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=true&include-audio-link=false");
                     response.EnsureSuccessStatusCode();
 
                     string content = await response.Content.ReadAsStringAsync();
                     var jsonDocument = JsonDocument.Parse(content);
                     var passages = jsonDocument.RootElement.GetProperty("passages");
 
+                    var pssg = passages[0].GetString();
+                    var pssgsplit = pssg.Split("\n");
+                    var bcv = pssgsplit[0];
                     bibleVerse.Text = passages[0].GetString();
-                    
+                    string currentPassage = Book + " " + bibleVerse.Chapter + ":" + bibleVerse.Verse;
+
+                    if (!bcv.Equals(currentPassage))
+                    {
+                         bibleVerse = await _context.BibleVerse
+                        .Include(v => v.VerseTags)
+                            .ThenInclude(vt => vt.Tag)
+                        .Include(bb => bb.BibleBook)
+                        .FirstOrDefaultAsync(m => m.Id == id);
+                        ViewBag.BibleBooks = await _context.BibleBook.ToListAsync();
+                        return View(bibleVerse);
+                    }
+
                     var verseTags = _context.VerseTag.Where(vt => vt.BibleVerseId == bibleVerse.Id);
 
                     if (!verseTags.IsNullOrEmpty())
@@ -263,19 +294,23 @@ namespace CoolBibleVerses.Controllers
                         List<int> tagIds = new List<int>();
                         string[] tagList = Tags.Split(",");
                         var dbTags = _context.Tag.ToList();
+                        string tText = "";
 
                         foreach (var tag in tagList)
                         {
-                            var existingTag = dbTags.FirstOrDefault(t => t.tagText == tag.ToLower().Trim());
+                            var existingTag = dbTags.FirstOrDefault(t => t.tagText.ToUpper() == tag.ToUpper().Trim());
                             if (existingTag == null)
                             {
+                                Console.WriteLine(tag);
+                                foreach (var t in Regex.Split(tag.Trim(), @"\s+")) { tText += (Char.ToUpper(t[0]) + t.Substring(1).ToLower()).Trim() + " "; }
                                 var newTag = new Tag
                                 {
-                                    tagText = tag.ToLower().Trim(),
+                                    tagText = tText.Trim()
                                 };
                                 _context.Tag.Add(newTag);
                                 await _context.SaveChangesAsync();
                                 tagIds.Add(newTag.Id);
+                                tText = "";
                             }
                             else
                             {
@@ -365,10 +400,26 @@ namespace CoolBibleVerses.Controllers
 
         public async Task<IActionResult> ShowSearchResults(String SearchTerm)
         {
-            string searchTerm = SearchTerm.ToLower();
-            return View("Index", await _context.BibleVerse.Include(bv => bv.VerseTags).ToListAsync());
-        }
+            string searchTerm = "";
+            if (SearchTerm != null)
+            {
+                searchTerm = SearchTerm.ToLower();
+            }
 
+            return View("Index", 
+                await _context.BibleVerse
+                .Where(bv => 
+                SearchTerm.Contains(bv.BibleBook.bookName) && SearchTerm.Contains(bv.Chapter.ToString()) && SearchTerm.Contains(bv.Verse.ToString()) || 
+                bv.VerseTags.Any(vt => (vt.Tag.tagText.ToUpper()).Contains(searchTerm.ToUpper()) || 
+                SearchTerm.Contains(bv.BibleBook.bookName) || 
+                bv.Text.ToLower().Contains(searchTerm) ||
+                bv.Details.ToLower().Contains(searchTerm)))
+                .Include(bv => bv.VerseTags)
+                .ThenInclude(t => t.Tag)
+                .Include(bb => bb.BibleBook).OrderBy(bb => bb.BibleBook.Id).ThenBy(bv => bv.Chapter).ThenBy(bv => bv.Verse)
+                .ToListAsync()
+                );
+        }
         private bool BibleVerseExists(int id)
         {
             return _context.BibleVerse.Any(e => e.Id == id);
