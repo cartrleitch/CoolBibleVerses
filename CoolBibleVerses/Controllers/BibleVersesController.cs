@@ -110,14 +110,24 @@ namespace CoolBibleVerses.Controllers
                     HttpClient client = new HttpClient();
                     client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
 
-                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=false&include-audio-link=false");
+                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=true&include-audio-link=false");
                     response.EnsureSuccessStatusCode();
 
                     string content = await response.Content.ReadAsStringAsync();
                     var jsonDocument = JsonDocument.Parse(content);
                     var passages = jsonDocument.RootElement.GetProperty("passages");
 
+                    var pssg = passages[0].GetString();
+                    var pssgsplit = pssg.Split("\n");
+                    var bcv = pssgsplit[0];
                     bibleVerse.Text = passages[0].GetString();
+                    string currentPassage = Book + " " + bibleVerse.Chapter + ":" + bibleVerse.Verse;
+
+                    if (!bcv.Equals(currentPassage))
+                    {
+                        ViewBag.BibleBooks = await _context.BibleBook.ToListAsync();
+                        return View(bibleVerse);
+                    }
 
                     _context.Add(bibleVerse);
                     await _context.SaveChangesAsync();
@@ -245,15 +255,30 @@ namespace CoolBibleVerses.Controllers
                     HttpClient client = new HttpClient();
                     client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
 
-                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=false&include-audio-link=false");
+                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=true&include-audio-link=false");
                     response.EnsureSuccessStatusCode();
 
                     string content = await response.Content.ReadAsStringAsync();
                     var jsonDocument = JsonDocument.Parse(content);
                     var passages = jsonDocument.RootElement.GetProperty("passages");
 
+                    var pssg = passages[0].GetString();
+                    var pssgsplit = pssg.Split("\n");
+                    var bcv = pssgsplit[0];
                     bibleVerse.Text = passages[0].GetString();
-                    
+                    string currentPassage = Book + " " + bibleVerse.Chapter + ":" + bibleVerse.Verse;
+
+                    if (!bcv.Equals(currentPassage))
+                    {
+                         bibleVerse = await _context.BibleVerse
+                        .Include(v => v.VerseTags)
+                            .ThenInclude(vt => vt.Tag)
+                        .Include(bb => bb.BibleBook)
+                        .FirstOrDefaultAsync(m => m.Id == id);
+                        ViewBag.BibleBooks = await _context.BibleBook.ToListAsync();
+                        return View(bibleVerse);
+                    }
+
                     var verseTags = _context.VerseTag.Where(vt => vt.BibleVerseId == bibleVerse.Id);
 
                     if (!verseTags.IsNullOrEmpty())
