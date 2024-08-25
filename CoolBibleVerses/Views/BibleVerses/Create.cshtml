@@ -27,9 +27,12 @@
                 <span asp-validation-for="Chapter" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Verse" class="control-label"></label>
+                <label asp-for="Verse" class="control-label" style="display:inline;"></label>
                 <input asp-for="Verse" class="form-control" />
                 <span asp-validation-for="Verse" class="text-danger"></span>
+                <label asp-for="VerseEnd" class="control-label" style="display:inline;"></label>
+                <input asp-for="VerseEnd" class="form-control" />
+                <span asp-validation-for="VerseEnd" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Details" class="control-label"></label>

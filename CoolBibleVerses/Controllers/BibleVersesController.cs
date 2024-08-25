@@ -76,7 +76,7 @@ namespace CoolBibleVerses.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Chapter,Verse,Details")] BibleVerse bibleVerse, string? Tags, string Book)
+        public async Task<IActionResult> Create([Bind("Chapter,Verse,VerseEnd,Details")] BibleVerse bibleVerse, string? Tags, string Book)
         {
             foreach (var state in ModelState)
             {
