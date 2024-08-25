@@ -269,19 +269,23 @@ namespace CoolBibleVerses.Controllers
                         List<int> tagIds = new List<int>();
                         string[] tagList = Tags.Split(",");
                         var dbTags = _context.Tag.ToList();
+                        string tText = "";
 
                         foreach (var tag in tagList)
                         {
-                            var existingTag = dbTags.FirstOrDefault(t => t.tagText == (Char.ToUpper(tag[0]) + tag.Substring(1).ToLower()).Trim());
+                            var existingTag = dbTags.FirstOrDefault(t => t.tagText.ToUpper() == tag.ToUpper().Trim());
                             if (existingTag == null)
                             {
+                                Console.WriteLine(tag);
+                                foreach (var t in Regex.Split(tag.Trim(), @"\s+")) { tText += (Char.ToUpper(t[0]) + t.Substring(1).ToLower()).Trim() + " "; }
                                 var newTag = new Tag
                                 {
-                                    tagText = (Char.ToUpper(tag[0]) + tag.Substring(1).ToLower()).Trim(),
+                                    tagText = tText.Trim()
                                 };
                                 _context.Tag.Add(newTag);
                                 await _context.SaveChangesAsync();
                                 tagIds.Add(newTag.Id);
+                                tText = "";
                             }
                             else
                             {
