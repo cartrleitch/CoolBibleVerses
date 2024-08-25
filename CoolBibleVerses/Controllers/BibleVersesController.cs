@@ -255,7 +255,7 @@ namespace CoolBibleVerses.Controllers
                     HttpClient client = new HttpClient();
                     client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
 
-                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=true&include-audio-link=false");
+                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=true&include-audio-link=false"); 
                     response.EnsureSuccessStatusCode();
 
                     string content = await response.Content.ReadAsStringAsync();
