@@ -89,7 +89,7 @@ namespace CoolBibleVerses.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    bibleVerse.EnteredBy = User.Identity.Name;
+                    bibleVerse.EnteredBy = User.Identity?.Name ?? "Unknown";
                     bibleVerse.DateEntered = DateTime.Now;
                     // Get BibleBookId from BibleBook table
                     if (Book is not null)

@@ -14,8 +14,10 @@ namespace CoolBibleVerses.Models
         public string Details { get; set; }
         public ICollection<VerseTag>? VerseTags { get; set; }
         public BibleBook? BibleBook { get; set; }
-        public string EnteredBy { get; set; }
-        public DateTime DateEntered { get; set; }
+        [Display(Name = "Created By")]
+        public string? EnteredBy { get; set; }
+        [Display(Name = "Date Created")]
+        public DateTime? DateEntered { get; set; }
 
 
         public BibleVerse()
