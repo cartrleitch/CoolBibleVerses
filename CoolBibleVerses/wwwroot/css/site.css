@@ -65,8 +65,8 @@ privacy {
 
 }
     .nav:hover {
-        background-color: #e8e8e8;
-        border-color: #e8e8e8;
+        background-color: rgb(111, 71, 18);
+        border-color: rgb(111, 71, 18);
     }
 
 .cut-text {

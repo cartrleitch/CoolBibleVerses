@@ -9,11 +9,11 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CoolBibleVerses.styles.css" asp-append-version="true" />
 </head>
-<body>
+<body style="background:#ffe4c0">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white box-shadow mb-3" style="border-bottom: solid; border-bottom-color: #93611e; background:rgb(102, 60, 5) !important">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Cool Bible Verses</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" style="color:rgba(255, 255, 255, 0.9)">Cool Bible Verses</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -21,10 +21,10 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index" style="font-weight:600; color:#ffff !important">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav nav-link text-dark" asp-area="" asp-controller="BibleVerses" asp-action="Index">Bible Verses</a>
+                            <a class="nav nav-link text-dark" asp-area="" asp-controller="BibleVerses" asp-action="Index" style="font-weight:600; color:#ffff !important">Bible Verses</a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
