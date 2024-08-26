@@ -451,10 +451,10 @@ namespace CoolBibleVerses.Controllers
                 await _context.BibleVerse
                 .Where(bv => 
                 SearchTerm.Contains(bv.BibleBook.bookName) && SearchTerm.Contains(bv.Chapter.ToString()) && SearchTerm.Contains(bv.Verse.ToString()) || 
-                bv.VerseTags.Any(vt => (vt.Tag.tagText.ToUpper()).Contains(searchTerm.ToUpper()) || 
+                bv.VerseTags.Any(vt => (vt.Tag.tagText.ToUpper()).Contains(searchTerm.ToUpper())) || 
                 SearchTerm.Contains(bv.BibleBook.bookName) || 
                 bv.Text.ToLower().Contains(searchTerm) ||
-                bv.Details.ToLower().Contains(searchTerm)))
+                bv.Details.ToLower().Contains(searchTerm))
                 .Include(bv => bv.VerseTags)
                 .ThenInclude(t => t.Tag)
                 .Include(bb => bb.BibleBook).OrderBy(bb => bb.BibleBook.Id).ThenBy(bv => bv.Chapter).ThenBy(bv => bv.Verse)
