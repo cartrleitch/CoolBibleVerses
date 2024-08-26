@@ -76,7 +76,7 @@ namespace CoolBibleVerses.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Chapter,Verse,Details")] BibleVerse bibleVerse, string? Tags, string Book)
+        public async Task<IActionResult> Create([Bind("Chapter,Verse,VerseEnd,Details")] BibleVerse bibleVerse, string? Tags, string Book)
         {
             foreach (var state in ModelState)
             {
@@ -105,12 +105,28 @@ namespace CoolBibleVerses.Controllers
                     }
 
                     // Get text from ESV API and set it to the bibleVerse.Text
-                    string passage = $"{Book}+{bibleVerse.Chapter}:{bibleVerse.Verse}";
+                    string passage = "";
+                    if (bibleVerse.Verse is not null && bibleVerse.VerseEnd is null || bibleVerse.VerseEnd == 0)
+                    {
+                        passage = $"{Book} {bibleVerse.Chapter}:{bibleVerse.Verse}";
+                    }
+                    else if (bibleVerse.Verse is not null && bibleVerse.VerseEnd is not null && bibleVerse.Verse < bibleVerse.VerseEnd)
+                    {
+                        passage = $"{Book} {bibleVerse.Chapter}:{bibleVerse.Verse}–{bibleVerse.VerseEnd}";
+                    }
+                    else if (bibleVerse.Verse is null || bibleVerse.Verse == 0 && bibleVerse.VerseEnd is null || bibleVerse.VerseEnd == 0)
+                    {
+                        passage = $"{Book} {bibleVerse.Chapter}";
+                    }
+                    else
+                    {
+                        passage = $"{Book} {bibleVerse.Chapter}";
+                    }
 
                     HttpClient client = new HttpClient();
                     client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
 
-                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=true&include-audio-link=false");
+                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=true&include-passage-references=true&include-audio-link=false");
                     response.EnsureSuccessStatusCode();
 
                     string content = await response.Content.ReadAsStringAsync();
@@ -120,10 +136,9 @@ namespace CoolBibleVerses.Controllers
                     var pssg = passages[0].GetString();
                     var pssgsplit = pssg.Split("\n");
                     var bcv = pssgsplit[0];
-                    bibleVerse.Text = passages[0].GetString();
-                    string currentPassage = Book + " " + bibleVerse.Chapter + ":" + bibleVerse.Verse;
+                    bibleVerse.Text = string.Join("\n", pssgsplit.Skip(2));
 
-                    if (!bcv.Equals(currentPassage))
+                    if (!bcv.Equals(passage))
                     {
                         ViewBag.BibleBooks = await _context.BibleBook.ToListAsync();
                         return View(bibleVerse);
@@ -222,7 +237,7 @@ namespace CoolBibleVerses.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BibleBookId,Chapter,Verse,Details,VerseTags,BibleBook")] BibleVerse bibleVerse, string? Tags, string Book)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BibleBookId,Chapter,Verse,VerseEnd,Details,VerseTags,BibleBook")] BibleVerse bibleVerse, string? Tags, string Book)
         {
             if (id != bibleVerse.Id)
             {
@@ -250,12 +265,28 @@ namespace CoolBibleVerses.Controllers
                     }
 
                     // Get text from ESV API and set it to the bibleVerse.Text
-                    string passage = $"{Book}+{bibleVerse.Chapter}:{bibleVerse.Verse}";
+                    string passage = "";
+                    if (bibleVerse.Verse is not null && bibleVerse.VerseEnd is null || bibleVerse.VerseEnd == 0)
+                    {
+                        passage = $"{Book} {bibleVerse.Chapter}:{bibleVerse.Verse}";
+                    }
+                    else if (bibleVerse.Verse is not null && bibleVerse.VerseEnd is not null && bibleVerse.Verse < bibleVerse.VerseEnd)
+                    {
+                        passage = $"{Book} {bibleVerse.Chapter}:{bibleVerse.Verse}–{bibleVerse.VerseEnd}";
+                    }
+                    else if (bibleVerse.Verse is null || bibleVerse.Verse == 0 && bibleVerse.VerseEnd is null || bibleVerse.VerseEnd == 0)
+                    {
+                        passage = $"{Book} {bibleVerse.Chapter}";
+                    }
+                    else
+                    {
+                        passage = $"{Book} {bibleVerse.Chapter}";
+                    }
 
                     HttpClient client = new HttpClient();
                     client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
 
-                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=false&include-passage-references=true&include-audio-link=false");
+                    var response = await client.GetAsync($"{baseUrl}?q={Uri.EscapeDataString(passage)}&include-footnotes=false&include-headings=false&include-verse-numbers=true&include-passage-references=true&include-audio-link=false"); 
                     response.EnsureSuccessStatusCode();
 
                     string content = await response.Content.ReadAsStringAsync();
@@ -265,10 +296,9 @@ namespace CoolBibleVerses.Controllers
                     var pssg = passages[0].GetString();
                     var pssgsplit = pssg.Split("\n");
                     var bcv = pssgsplit[0];
-                    bibleVerse.Text = passages[0].GetString();
-                    string currentPassage = Book + " " + bibleVerse.Chapter + ":" + bibleVerse.Verse;
+                    bibleVerse.Text = string.Join("\n", pssgsplit.Skip(2));
 
-                    if (!bcv.Equals(currentPassage))
+                    if (!bcv.Equals(passage))
                     {
                          bibleVerse = await _context.BibleVerse
                         .Include(v => v.VerseTags)
