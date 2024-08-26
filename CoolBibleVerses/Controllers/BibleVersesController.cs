@@ -64,7 +64,7 @@ namespace CoolBibleVerses.Controllers
         }
 
         // GET: BibleVerses/Create
-        [Authorize]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Create()
         {
             ViewBag.BibleBooks = await _context.BibleBook.ToListAsync();
@@ -216,7 +216,7 @@ namespace CoolBibleVerses.Controllers
         }
 
         // GET: BibleVerses/Edit/5
-        [Authorize]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -394,7 +394,7 @@ namespace CoolBibleVerses.Controllers
         }
 
         // GET: BibleVerses/Delete/5
-        [Authorize]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
