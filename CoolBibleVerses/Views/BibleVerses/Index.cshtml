@@ -48,7 +48,14 @@
                 @Html.DisplayFor(modelItem => item.Chapter)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Verse)
+                @{
+                    if (item.VerseEnd is null || item.VerseEnd == 0){
+                            <span>@item.Verse</span>
+                    }
+                    else if (item.VerseEnd is not null && item.VerseEnd > 0){
+                            <span>@item.Verse-@item.VerseEnd</span>
+                    }
+                }
             </td>
             <td>
                 <div class="verse-table-cell cut-text">
