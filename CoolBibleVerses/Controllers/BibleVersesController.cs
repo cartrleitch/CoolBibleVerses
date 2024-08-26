@@ -123,6 +123,11 @@ namespace CoolBibleVerses.Controllers
                         passage = $"{Book} {bibleVerse.Chapter}";
                     }
 
+                    if (passage.Contains("Psalms"))
+                    {
+                        passage = passage.Replace("Psalms", "Psalm");
+                    }
+
                     HttpClient client = new HttpClient();
                     client.DefaultRequestHeaders.Add("Authorization", $"Token {apiKey}");
 
@@ -138,6 +143,7 @@ namespace CoolBibleVerses.Controllers
                     var bcv = pssgsplit[0];
                     bibleVerse.Text = string.Join("\n", pssgsplit.Skip(2));
 
+                    Console.WriteLine($"-{bcv}-{passage}-");
                     if (!bcv.Equals(passage))
                     {
                         ViewBag.BibleBooks = await _context.BibleBook.ToListAsync();
@@ -281,6 +287,11 @@ namespace CoolBibleVerses.Controllers
                     else
                     {
                         passage = $"{Book} {bibleVerse.Chapter}";
+                    }
+
+                    if (passage.Contains("Psalms"))
+                    {
+                        passage = passage.Replace("Psalms", "Psalm");
                     }
 
                     HttpClient client = new HttpClient();
