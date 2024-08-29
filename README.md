@@ -1,2 +1,2 @@
 Todo:
-1. Deploy on Pi (dockerize and get domain)
+1. Fix index table on mobile
