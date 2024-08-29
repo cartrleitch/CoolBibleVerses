@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.RegularExpressions;
+using Azure;
 
 
 namespace CoolBibleVerses.Controllers
@@ -94,8 +95,9 @@ namespace CoolBibleVerses.Controllers
                     // Get BibleBookId from BibleBook table
                     if (Book is not null)
                     {
-                        string bibleBookName = (Char.ToUpper(Book[0]) + Book.Substring(1).ToLower()).Trim();
-                        var bibleBook = _context.BibleBook.Where(bb => bb.bookName == bibleBookName).FirstOrDefault();
+                        string bibleBookName = "";
+                        foreach (var t in Regex.Split(Book.Trim(), @"\s+")) { bibleBookName += (Char.ToUpper(t[0]) + t.Substring(1).ToLower()).Trim() + " "; }
+                        var bibleBook = _context.BibleBook.Where(bb => bb.bookName == bibleBookName.Trim()).FirstOrDefault();
                         if (bibleBook is null)
                         {
                             bibleVerse.BibleBookId = 0;
@@ -260,8 +262,9 @@ namespace CoolBibleVerses.Controllers
                     // Get BibleBookId from BibleBook table
                     if (Book is not null)
                     {
-                        string bibleBookName = (Char.ToUpper(Book[0]) + Book.Substring(1).ToLower()).Trim();
-                        var bibleBook = _context.BibleBook.Where(bb => bb.bookName == bibleBookName).FirstOrDefault();
+                        string bibleBookName = "";
+                        foreach (var t in Regex.Split(Book.Trim(), @"\s+")) { bibleBookName += (Char.ToUpper(t[0]) + t.Substring(1).ToLower()).Trim() + " "; }
+                        var bibleBook = _context.BibleBook.Where(bb => bb.bookName == bibleBookName.Trim()).FirstOrDefault();
                         if (bibleBook is null)
                         {
                             bibleVerse.BibleBookId = 0;
