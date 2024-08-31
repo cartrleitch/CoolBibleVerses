@@ -14,75 +14,77 @@
     <a asp-action="Create" class="button-primary">Create New</a>
 </p>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Book
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Chapter)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Verse)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Details)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Text)
-            </th>
-            <th>
-                Tags
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-                <td style="width: 150px;">
-                @Html.DisplayFor(model => item.BibleBook.bookName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Chapter)
-            </td>
-            <td>
-                @{
-                    if (item.VerseEnd is null || item.VerseEnd == 0){
-                            <span>@item.Verse</span>
+<div style="overflow-x:auto">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Book
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Chapter)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Verse)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Details)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Text)
+                </th>
+                <th>
+                    Tags
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+    @foreach (var item in Model) {
+            <tr>
+                    <td style="width: 150px;">
+                    @Html.DisplayFor(model => item.BibleBook.bookName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Chapter)
+                </td>
+                <td>
+                    @{
+                        if (item.VerseEnd is null || item.VerseEnd == 0){
+                                <span>@item.Verse</span>
+                        }
+                        else if (item.VerseEnd is not null && item.VerseEnd > 0){
+                                <span>@item.Verse-@item.VerseEnd</span>
+                        }
                     }
-                    else if (item.VerseEnd is not null && item.VerseEnd > 0){
-                            <span>@item.Verse-@item.VerseEnd</span>
+                </td>
+                <td>
+                    <div class="verse-table-cell cut-text">
+                        @Html.DisplayFor(modelItem => item.Details)
+                    </div>
+                </td>
+                <td>
+                    <div class="verse-table-cell cut-text">
+                        @Html.DisplayFor(modelItem => item.Text)
+                    </div>
+                </td>                
+                <td>
+                    @{
+                        string tags = "";
+                        if (item.VerseTags != null)
+                        {
+                        tags = string.Join(", ", item.VerseTags.Select(t => t.Tag.tagText));
+                        }
                     }
-                }
-            </td>
-            <td>
-                <div class="verse-table-cell cut-text">
-                    @Html.DisplayFor(modelItem => item.Details)
-                </div>
-            </td>
-            <td>
-                <div class="verse-table-cell cut-text">
-                    @Html.DisplayFor(modelItem => item.Text)
-                </div>
-            </td>                
-            <td>
-                @{
-                    string tags = "";
-                    if (item.VerseTags != null)
-                    {
-                    tags = string.Join(", ", item.VerseTags.Select(t => t.Tag.tagText));
-                    }
-                }
-                <span>@tags</span>
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+                    <span>@tags</span>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+    }
+        </tbody>
+    </table>
+</div>
