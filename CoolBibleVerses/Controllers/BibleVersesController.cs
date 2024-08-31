@@ -171,15 +171,18 @@ namespace CoolBibleVerses.Controllers
                             if (existingTag == null)
                             {
                                 Console.WriteLine(tag);
-                                foreach (var t in Regex.Split(tag.Trim(), @"\s+")) { tText += (Char.ToUpper(t[0]) + t.Substring(1).ToLower()).Trim() + " "; }
-                                var newTag = new Tag
+                                if (tag is not null && tag != " " && !tag.Equals(""))
                                 {
-                                    tagText = tText.Trim()
-                                };
-                                _context.Tag.Add(newTag);
-                                await _context.SaveChangesAsync();
-                                tagIds.Add(newTag.Id);
-                                tText = "";
+                                    foreach (var t in Regex.Split(tag.Trim(), @"\s+")) { tText += (Char.ToUpper(t[0]) + t.Substring(1).ToLower()).Trim() + " "; }
+                                    var newTag = new Tag
+                                    {
+                                        tagText = tText.Trim()
+                                    };
+                                    _context.Tag.Add(newTag);
+                                    await _context.SaveChangesAsync();
+                                    tagIds.Add(newTag.Id);
+                                    tText = "";
+                                }
                             }
                             else
                             {
@@ -187,7 +190,7 @@ namespace CoolBibleVerses.Controllers
                             }
 
                         }
-
+                        
                         bibleVerse.VerseTags = new List<VerseTag>();
 
                         // Add tags to VerseTag table
@@ -347,16 +350,18 @@ namespace CoolBibleVerses.Controllers
                             var existingTag = dbTags.FirstOrDefault(t => t.tagText.ToUpper() == tag.ToUpper().Trim());
                             if (existingTag == null)
                             {
-                                Console.WriteLine(tag);
-                                foreach (var t in Regex.Split(tag.Trim(), @"\s+")) { tText += (Char.ToUpper(t[0]) + t.Substring(1).ToLower()).Trim() + " "; }
-                                var newTag = new Tag
+                                if (tag is not null && tag != " " && !tag.Equals(""))
                                 {
-                                    tagText = tText.Trim()
-                                };
-                                _context.Tag.Add(newTag);
-                                await _context.SaveChangesAsync();
-                                tagIds.Add(newTag.Id);
-                                tText = "";
+                                    foreach (var t in Regex.Split(tag.Trim(), @"\s+")) { tText += (Char.ToUpper(t[0]) + t.Substring(1).ToLower()).Trim() + " "; }
+                                    var newTag = new Tag
+                                    {
+                                        tagText = tText.Trim()
+                                    };
+                                    _context.Tag.Add(newTag);
+                                    await _context.SaveChangesAsync();
+                                    tagIds.Add(newTag.Id);
+                                    tText = "";
+                                }
                             }
                             else
                             {
