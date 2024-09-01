@@ -1,5 +1,6 @@
 using CoolBibleVerses.Data;
 using CoolBibleVerses.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
