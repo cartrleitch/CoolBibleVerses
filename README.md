@@ -1,3 +1,1 @@
-Todo:
-1. Https (SSL certificate and update webserver config)
-2. No port number in url (port 443 default)
+Web App using ASP.NET that allows full CRUD operations for storing cool Bible verses (and passages). Also allows searching for Bible verses based on tags, details, verse text, and more.
