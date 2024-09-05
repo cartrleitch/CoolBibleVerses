@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,28 @@ builder.Services.AddRazorPages();
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+});
+
+var logger = LoggerFactory.Create(loggingBuilder => loggingBuilder.AddConsole()).CreateLogger("CertificateLogger");
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    var certPath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:Path"];
+    var certKeyPath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:KeyPath"];
+    try
+    {
+        var certificate = new X509Certificate2(certPath, certKeyPath);
+        serverOptions.ConfigureHttpsDefaults(listenOptions =>
+        {
+            listenOptions.ServerCertificate = certificate;
+        });
+
+        logger.LogInformation($"Certificate loaded successfully. Subject: {certificate.Subject}, Issuer: {certificate.Issuer}, Thumbprint: {certificate.Thumbprint}");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError($"Failed to load certificate. Path: {certPath}, KeyPath: {certKeyPath}, Exception: {ex.Message}");
+    }
 });
 
 var app = builder.Build();
@@ -69,4 +92,3 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
-
