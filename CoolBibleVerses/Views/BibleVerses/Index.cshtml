@@ -14,8 +14,12 @@
     <a asp-action="Create" class="button-primary">Create New</a>
 </p>
 
-<div style="overflow-x:auto">
-    <table class="table">
+<div id="top-scroll-container" style="overflow-x:auto; margin-bottom: 10px; height: 20px;">
+    <div id="top-scroll" style="width: 100%; height: 20px;"></div>
+</div>
+
+<div id="bottom-scroll-container" style="overflow-x:auto;">
+    <table id="main-table" class="table" style="background:#ffd7a1; border: 2px solid;">
         <thead>
             <tr>
                 <th>
@@ -40,51 +44,75 @@
             </tr>
         </thead>
         <tbody>
-    @foreach (var item in Model) {
-            <tr>
+            @foreach (var item in Model)
+            {
+                <tr>
                     <td style="width: 150px;">
-                    @Html.DisplayFor(model => item.BibleBook.bookName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Chapter)
-                </td>
-                <td>
-                    @{
-                        if (item.VerseEnd is null || item.VerseEnd == 0){
-                                <span>@item.Verse</span>
-                        }
-                        else if (item.VerseEnd is not null && item.VerseEnd > 0){
-                                <span>@item.Verse-@item.VerseEnd</span>
-                        }
-                    }
-                </td>
-                <td>
-                    <div class="verse-table-cell cut-text">
-                        @Html.DisplayFor(modelItem => item.Details)
-                    </div>
-                </td>
-                <td>
-                    <div class="verse-table-cell cut-text">
-                        @Html.DisplayFor(modelItem => item.Text)
-                    </div>
-                </td>                
-                <td>
-                    @{
-                        string tags = "";
-                        if (item.VerseTags != null)
+                        @Html.DisplayFor(model => item.BibleBook.bookName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Chapter)
+                    </td>
+                    <td>
+                        @if (item.VerseEnd is null || item.VerseEnd == 0)
                         {
-                        tags = string.Join(", ", item.VerseTags.Select(t => t.Tag.tagText));
+                            <span>@item.Verse</span>
                         }
-                    }
-                    <span>@tags</span>
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-    }
+                        else if (item.VerseEnd is not null && item.VerseEnd > 0)
+                        {
+                            <span>@item.Verse-@item.VerseEnd</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="verse-table-cell cut-text">
+                            @Html.DisplayFor(modelItem => item.Details)
+                        </div>
+                    </td>
+                    <td>
+                        <div class="verse-table-cell cut-text">
+                            @Html.DisplayFor(modelItem => item.Text)
+                        </div>
+                    </td>
+                    <td>
+                        @{
+                            string tags = "";
+                            if (item.VerseTags != null)
+                            {
+                                tags = string.Join(", ", item.VerseTags.Select(t => t.Tag.tagText));
+                            }
+                        }
+                        <span>@tags</span>
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var topScrollContainer = document.getElementById("top-scroll-container");
+            var bottomScrollContainer = document.getElementById("bottom-scroll-container");
+            var topScroll = document.getElementById("top-scroll");
+            var mainTable = document.getElementById("main-table");
+
+            // Set the width of the top scroll div to match the table width
+            topScroll.style.width = mainTable.scrollWidth + "px";
+
+            // Synchronize the scroll positions
+            topScrollContainer.addEventListener("scroll", function () {
+                bottomScrollContainer.scrollLeft = topScrollContainer.scrollLeft;
+            });
+
+            bottomScrollContainer.addEventListener("scroll", function () {
+                topScrollContainer.scrollLeft = bottomScrollContainer.scrollLeft;
+            });
+        });
+    </script>
+}
