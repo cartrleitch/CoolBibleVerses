@@ -22,16 +22,11 @@ namespace CoolBibleVerses.Data
                 }
             }
 
-            IdentityUser admin1 = await userManager.FindByEmailAsync("carterleitch@gmail.com");
-            IdentityUser admin2 = await userManager.FindByEmailAsync("yourhotmom12@gmail.com");
+            IdentityUser? admin = await userManager.FindByEmailAsync(Environment.GetEnvironmentVariable("ADMIN_EMAIL") ?? "");
 
-            if (admin1 != null)
+            if (admin != null)
             {
-                await userManager.AddToRoleAsync(admin1, "Admin");
-            }
-            if (admin2 != null)
-            {
-                await userManager.AddToRoleAsync(admin2, "Admin");
+                await userManager.AddToRoleAsync(admin, "Admin");
             }
         }
     }

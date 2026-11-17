@@ -7,10 +7,6 @@
         public BibleVerse BibleVerse { get; set; }
         public Tag Tag { get; set; }
 
-        public VerseTag()
-        {
-
-        }
     }
     
 }
