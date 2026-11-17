@@ -1,28 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CoolBibleVerses.Data;
 using CoolBibleVerses.Models;
 using Microsoft.AspNetCore.Authorization;
-using System.Net.Http;
 using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
-using System.ComponentModel;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.RegularExpressions;
-using Azure;
-
 
 namespace CoolBibleVerses.Controllers
 {
     public class BibleVersesController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private static readonly string apiKey = "0a978d16cd48e5a4bee9e4daa1ccfcaa21a6cd5a";
+        private static readonly string? apiKey = Environment.GetEnvironmentVariable("ESV_API_KEY");
         private static readonly string baseUrl = "https://api.esv.org/v3/passage/text/";
 
         public BibleVersesController(ApplicationDbContext context)
